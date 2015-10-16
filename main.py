@@ -2,24 +2,42 @@
 
 import threading
 import time
+import random
 
-def simulateProducer(pcbuffer, buffer_limit):
-    """ Simulate the producer. 
-    
-    For now simply prints out "Producer" buffer_limit times.
-    """
-    for i in xrange(buffer_limit):
-        print "Producer"
-        time.sleep(0.5)
+NO_PRODUCERS = 10
+NO_CONSUMERS = 15
 
-def simulateConsumer(pcbuffer, buffer_limit):
-    """ Simulate the consumer. 
-    
-    For now simply prints out "Consumer" 10 times.
+MAX_DELAY_PRODUCER = 1
+MAX_DELAY_CONSUMER = 1
+
+def _simulateProducer(pcbuffer):
+    """ Simulate a single producer.
     """
-    for i in xrange(buffer_limit):
-        print "Consumer"
-        time.sleep(0.5)
+    print "Producer produces."
+    print "new item"
+    pcbuffer.append("new item")
+
+def _simulateConsumer(pcbuffer):
+    """ Simulate a single consumer.
+    """
+    print "Consumer consumes."
+    print pcbuffer.pop()
+
+def simulateProducer(pcbuffer):
+    """ Simulate producers coming in. 
+    """
+    for i in xrange(NO_PRODUCERS):
+        print "Producer {0} comes in.".format(i)
+        _simulateProducer(pcbuffer)
+        time.sleep(random.uniform(0, MAX_DELAY_PRODUCER))
+
+def simulateConsumer(pcbuffer):
+    """ Simulate the consumers coming in.
+    """
+    for i in xrange(NO_CONSUMERS):
+        print "Consumer {0} comes in.".format(i)
+        _simulateConsumer(pcbuffer)
+        time.sleep(random.uniform(0, MAX_DELAY_CONSUMER))
 
 def main():
     """ Simulate the producer consumer problem."""
@@ -27,11 +45,9 @@ def main():
     # the buffer used
     pcbuffer = []
 
-    # limit of the buffer
-    buffer_limit = 10
-
-    pthread = threading.Thread(target=simulateProducer, name="ProducerT", args=(pcbuffer, buffer_limit))
-    cthread = threading.Thread(target=simulateConsumer, name="ConsumerT", args=(pcbuffer, buffer_limit))
+    # note the trailing , in  the tuple passed to args
+    pthread = threading.Thread(target=simulateProducer, name="ProducerT", args=(pcbuffer, ))
+    cthread = threading.Thread(target=simulateConsumer, name="ConsumerT", args=(pcbuffer, ))
 
     pthread.start()
     cthread.start()
