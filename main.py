@@ -15,7 +15,7 @@ mutex = threading.Lock()
 BUFFER_SIZE = 10
 
 # number of producers and consumers involved in the simulation
-NO_PRODUCERS = 10
+NO_PRODUCERS = 15
 NO_CONSUMERS = 15
 
 MAX_DELAY_PRODUCER = 1
@@ -25,40 +25,42 @@ def _simulateProducer(pcbuffer):
     """ Simulate a single producer.
     """
 
-    # TODO wait for space on the buffer
+    # wait for space on the buffer
+    emptyslots.acquire()
 
     # obtain lock over the buffer
     mutex.acquire()
 
     # CRITICAL SECTION
-    print "Producer produces."
-    print "new item"
+    print "Producer produces :", "new item"
     pcbuffer.append("new item")
     # END CRITICAL SECTION
 
     # release lock over the buffer
     mutex.release()
 
-    # TODO signal the addition of a new item
+    # signal the addition of a new item
+    filledslots.release()
 
 def _simulateConsumer(pcbuffer):
     """ Simulate a single consumer.
     """
 
-    # TODO wait for items on the buffer
+    # wait for items on the buffer
+    filledslots.acquire()
 
     # obtain lock over the buffer
     mutex.acquire()
 
     # CRITICAL SECTION
-    print "Consumer consumes."
-    print pcbuffer.pop()
+    print "Consumer consumes :", pcbuffer.pop()
     # END CRITICAL SECTION
 
     # release lock over the buffer
     mutex.release()
 
-    # TODO signal the consumption of a new item
+    # signal the consumption of a new item
+    emptyslots.release()
 
 def simulateProducer(pcbuffer):
     """ Simulate producers coming in. 
