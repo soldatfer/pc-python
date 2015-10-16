@@ -4,6 +4,17 @@ import threading
 import time
 import random
 
+# Sempahores to be shared between threads
+emptyslots = None
+filledslots = None
+
+# mutex lock to access the buffer 
+mutex = threading.Lock()
+
+# size of buffer
+BUFFER_SIZE = 10
+
+# number of producers and consumers involved in the simulation
 NO_PRODUCERS = 10
 NO_CONSUMERS = 15
 
@@ -16,7 +27,8 @@ def _simulateProducer(pcbuffer):
 
     # TODO wait for space on the buffer
 
-    # TODO obtain lock over the buffer
+    # obtain lock over the buffer
+    mutex.acquire()
 
     # CRITICAL SECTION
     print "Producer produces."
@@ -24,7 +36,8 @@ def _simulateProducer(pcbuffer):
     pcbuffer.append("new item")
     # END CRITICAL SECTION
 
-    # TODO release lock over the buffer
+    # release lock over the buffer
+    mutex.release()
 
     # TODO signal the addition of a new item
 
@@ -34,14 +47,16 @@ def _simulateConsumer(pcbuffer):
 
     # TODO wait for items on the buffer
 
-    # TODO obtain lock over the buffer
+    # obtain lock over the buffer
+    mutex.acquire()
 
     # CRITICAL SECTION
     print "Consumer consumes."
     print pcbuffer.pop()
     # END CRITICAL SECTION
 
-    # TODO release lock over the buffer
+    # release lock over the buffer
+    mutex.release()
 
     # TODO signal the consumption of a new item
 
@@ -66,6 +81,10 @@ def main():
 
     # the buffer used
     pcbuffer = []
+
+    global emptyslots, filledslots
+    emptyslots = threading.Semaphore(BUFFER_SIZE)
+    filledslots = threading.Semaphore(0)
 
     # note the trailing , in  the tuple passed to args
     pthread = threading.Thread(target=simulateProducer, name="ProducerT", args=(pcbuffer, ))
