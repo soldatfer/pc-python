@@ -13,15 +13,37 @@ MAX_DELAY_CONSUMER = 1
 def _simulateProducer(pcbuffer):
     """ Simulate a single producer.
     """
+
+    # TODO wait for space on the buffer
+
+    # TODO obtain lock over the buffer
+
+    # CRITICAL SECTION
     print "Producer produces."
     print "new item"
     pcbuffer.append("new item")
+    # END CRITICAL SECTION
+
+    # TODO release lock over the buffer
+
+    # TODO signal the addition of a new item
 
 def _simulateConsumer(pcbuffer):
     """ Simulate a single consumer.
     """
+
+    # TODO wait for items on the buffer
+
+    # TODO obtain lock over the buffer
+
+    # CRITICAL SECTION
     print "Consumer consumes."
     print pcbuffer.pop()
+    # END CRITICAL SECTION
+
+    # TODO release lock over the buffer
+
+    # TODO signal the consumption of a new item
 
 def simulateProducer(pcbuffer):
     """ Simulate producers coming in. 
